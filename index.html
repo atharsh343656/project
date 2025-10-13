@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker - SPA</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #e8f0fe; text-align: center; margin-top: 40px; }
+    .container { background: white; width: 350px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc; }
+    input, select { padding: 8px; margin: 5px; width: 80%; border-radius: 5px; border: 1px solid #ccc; }
+    button { padding: 10px 15px; border: none; background: #2196f3; color: white; border-radius: 5px; cursor: pointer; }
+    .balance { font-size: 22px; margin: 15px 0; }
+    ul { list-style: none; padding: 0; }
+    li { background: #f1f1f1; margin: 5px 0; padding: 8px; border-radius: 5px; display: flex; justify-content: space-between; }
+    .income { color: green; }
+    .expense { color: red; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>💰 Expense Tracker (SPA)</h2>
+    <div class="balance" id="balance">Balance: ₹0</div>
+
+    <input type="text" id="desc" placeholder="Description">
+    <input type="number" id="amount" placeholder="Amount">
+    <select id="type">
+      <option value="income">Income</option>
+      <option value="expense">Expense</option>
+    </select>
+    <button onclick="addTransaction()">Add</button>
+
+    <h3>Transactions</h3>
+    <ul id="list"></ul>
+  </div>
+
+  <script>
+    let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+
+    function updateUI() {
+      const list = document.getElementById('list');
+      list.innerHTML = '';
+      let balance = 0;
+
+      transactions.forEach((t, index) => {
+        balance += t.type === 'income' ? t.amount : -t.amount;
+        const li = document.createElement('li');
+        li.className = t.type;
+        li.innerHTML = `${t.desc} - ₹${t.amount} <button onclick="deleteTransaction(${index})">❌</button>`;
+        list.appendChild(li);
+      });
+
+      document.getElementById('balance').innerText = `Balance: ₹${balance}`;
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    function addTransaction() {
+      const desc = document.getElementById('desc').value;
+      const amount = parseFloat(document.getElementById('amount').value);
+      const type = document.getElementById('type').value;
+
+      if (!desc || !amount) return alert('Enter valid details');
+
+      transactions.push({ desc, amount, type });
+      updateUI();
+
+      document.getElementById('desc').value = '';
+      document.getElementById('amount').value = '';
+    }
+
+    function deleteTransaction(index) {
+      transactions.splice(index, 1);
+      updateUI();
+    }
+
+    updateUI(); // Load existing data
+  </script>
+
+</body>
+</html>
